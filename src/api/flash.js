@@ -48,9 +48,22 @@ export const flash = async (flasher, board, port, filename, options) => {
     await toStep(callback)("saveEEPROM");
     saveKey = await focusCommands.saveEEPROM();
 
+    // Clear the EEPROM after saving. We do this so that if the layout changed,
+    // and space previously used by one plugin ends up being given to another,
+    // we won't have garbage there, but uninitialised space instead.
+    try {
+      await focusCommands.eraseEEPROM();
+    } catch (e) {
+      if (e != "Communication timeout") {
+        throw new Error(e);
+      }
+    }
+
     if (!options.noBootloaderTrigger) {
+      // We do not need to trigger the bootloader here, the erase above did a
+      // reset for us already. Do wait a little, for a smoother transition.
       await toStep(callback)("bootloaderTrigger");
-      await focusCommands.reboot();
+      await delay(500);
     }
   } else {
     await toStep(callback)("factoryRestore");
