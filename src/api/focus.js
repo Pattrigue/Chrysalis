@@ -19,6 +19,7 @@ const { SerialPort } = require("serialport");
 
 import fs from "fs";
 import stream from "stream";
+import AsyncLock from "async-lock";
 
 import { logger } from "@api/log";
 
@@ -27,6 +28,8 @@ import Macros from "./focus/macros";
 import Keymap, { OnlyCustom } from "./focus/keymap";
 
 global.chrysalis_focus_instance = null;
+
+const lock = new AsyncLock();
 
 class FocusParser extends stream.Transform {
   constructor({ interval, ...transformOptions }) {
@@ -419,30 +422,32 @@ class Focus {
       },
     });
 
-    return new Promise((resolve, reject) => {
-      this._request(cmd, ...args)
-        .then((data) => {
-          logger("focus").verbose("response", {
-            request: {
-              id: rid,
-              command: cmd,
-              args: args,
-            },
-            response: data,
+    return new Promise(async (resolve, reject) => {
+      await lock.acquire("focus", () => {
+        this._request(cmd, ...args)
+          .then((data) => {
+            logger("focus").verbose("response", {
+              request: {
+                id: rid,
+                command: cmd,
+                args: args,
+              },
+              response: data,
+            });
+            resolve(data);
+          })
+          .catch((error) => {
+            logger("focus").error("request timed out", {
+              request: {
+                id: rid,
+                command: cmd,
+                args: args,
+              },
+              error: error,
+            });
+            reject("Communication timeout");
           });
-          resolve(data);
-        })
-        .catch((error) => {
-          logger("focus").error("request timed out", {
-            request: {
-              id: rid,
-              command: cmd,
-              args: args,
-            },
-            error: error,
-          });
-          reject("Communication timeout");
-        });
+      });
     });
   }
 
