@@ -29,9 +29,23 @@ export function FocusCommands(options) {
     };
     let port = focus._port;
 
+    console.log("reboot start?");
+
     if (devicePort && focusDeviceDescriptor) {
+      console.log("inner");
+      if (port?.isOpen) {
+        try {
+          console.log("await close");
+          await port.close();
+        } catch (_) {
+          /* ignore the error */
+        }
+      }
+      focus._port = undefined;
+      console.log("await port open");
       port = await focus.open(devicePort.path, focusDeviceDescriptor);
     }
+    console.log("blaah");
 
     const baudUpdate = () => {
       return new Promise((resolve) => {
@@ -54,6 +68,7 @@ export function FocusCommands(options) {
     };
 
     // Attempt calling device.reset first, if present.
+    console.log("requesting commands");
     let commands;
     try {
       commands = await focus.supported_commands();

@@ -219,7 +219,9 @@ const App = (props) => {
     setConnected(true);
 
     await navigate(
-      newActiveDevice.focusDetected() ? "/editor" : "/focus-not-detected"
+      newActiveDevice.focusDetected()
+        ? "/firmware-update"
+        : "/focus-not-detected"
     );
     return true;
   };

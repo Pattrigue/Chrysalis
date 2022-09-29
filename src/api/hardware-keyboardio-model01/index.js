@@ -57,7 +57,7 @@ const Model01 = {
 
   flashSteps: (options) => {
     if (options?.factoryReset) {
-      return ["factoryRestore", "bootloader", "flash"];
+      return ["bootloader", "flash", "reconnect", "factoryRestore"];
     }
 
     return ["saveEEPROM", "bootloader", "flash", "reconnect", "restoreEEPROM"];
@@ -114,7 +114,7 @@ const Model100 = {
 
   flashSteps: (options) => {
     if (options?.factoryReset) {
-      return ["factoryRestore", "bootloader", "flash"];
+      return ["bootloader", "flash", "reconnect", "factoryRestore"];
     }
 
     return ["saveEEPROM", "bootloader", "flash", "reconnect", "restoreEEPROM"];
@@ -162,8 +162,12 @@ const Model100Bootloader = {
     keymap: Keymap,
   },
 
-  flashSteps: () => {
-    return ["flash"];
+  flashSteps: (options) => {
+    if (options?.factoryReset) {
+      return ["flash", "reconnect", "factoryRestore"];
+    } else {
+      return ["flash"];
+    }
   },
   flash: async (port, filename, options) => {
     const opts = Object.assign({}, options);

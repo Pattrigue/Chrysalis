@@ -286,10 +286,14 @@ class Focus {
   async open(device_identifier, info) {
     if (typeof device_identifier == "string") {
       if (!info) throw new Error("Device descriptor argument is mandatory");
-      this._port = new SerialPort({
-        path: device_identifier,
-        baudRate: 9600,
-      });
+      try {
+        this._port = new SerialPort({
+          path: device_identifier,
+          baudRate: 9600,
+        });
+      } catch (e) {
+        throw new Error("foo");
+      }
     } else if (typeof device_identifier == "object") {
       if (device_identifier.hasOwnProperty("binding")) {
         if (!info) throw new Error("Device descriptor argument is mandatory");
