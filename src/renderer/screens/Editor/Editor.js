@@ -470,7 +470,7 @@ const Editor = (props) => {
         {layerNames.storageSize > 0 && (
           <LayerNamesStorageAlert layerNames={layerNames} />
         )}
-        <ToolBox setTool={setTool} tool={tool} />
+        <ToolBox setTool={setTool} tool={tool} hasColormap={hasColormap()} />
         {mainWidget}
       </Box>
       <Sidebar
