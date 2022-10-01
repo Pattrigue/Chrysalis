@@ -34,7 +34,6 @@ import { toast } from "@renderer/components/Toast";
 import useEffectOnce from "@renderer/hooks/useEffectOnce";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ToolBox } from "./ToolBox";
 import { FloatingKeyPicker } from "./components/FloatingKeyPicker";
 import { LegacyAlert } from "./components/LegacyAlert";
 import { MacroStorageAlert } from "./components/MacroStorageAlert";
@@ -470,7 +469,6 @@ const Editor = (props) => {
         {layerNames.storageSize > 0 && (
           <LayerNamesStorageAlert layerNames={layerNames} />
         )}
-        <ToolBox setTool={setTool} tool={tool} hasColormap={hasColormap()} />
         {mainWidget}
       </Box>
       <Sidebar
@@ -491,6 +489,9 @@ const Editor = (props) => {
         onLedChange={onLedChange}
         setOpenMacroEditor={maybeOpenMacroEditor}
         currentKey={currentKey}
+        tool={tool}
+        setTool={setTool}
+        hasColormap={hasColormap()}
       />
       {tool == "select" && (
         <FloatingKeyPicker
